@@ -100,37 +100,19 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id;
         session.user.username = token.username;
         session.user.email = token.email;
-        session.user.image = token.email;
-        session.user.username = token.username;
+        session.user.image = token.picture;
       }
-      const user = await db.user.findUnique({
-        where: {
-          id: token.id,
-        },
-      });
-      if (user) {
-        session.user.image = user.image;
-        session.user.username = user.username?.toLowerCase().replace(/\s+/g, '') || null;
-      }
-      console.log('SESSION: ', session);
       return session;
     },
     async jwt({ token, user }) {
-      const dbUser = await db.user.findFirst({
-        where: {
-          email: token.email,
-        },
-      });
-      if (!dbUser) {
-        token.id = user?.id;
-        return token;
+      if (user) {
+        return {
+          ...token,
+          id: user.id,
+          username: user.username,
+        };
       }
-      return {
-        id: dbUser.id,
-        email: dbUser.email,
-        username: dbUser.username,
-        picture: dbUser.image,
-      };
+      return token;
     },
   },
 };

@@ -18,11 +18,10 @@ export async function POST(request: Request) {
     const result = signUpSchema.safeParse(body);
 
     if (!result.success) {
-      // Enhanced message for validation failure
-      // Note: Removed redundant message concatenation and returned a simpler message.
+      const errorMessages = result.error.errors.map((e) => e.message).join(', ');
       return NextResponse.json(
-        { message: 'Validation Error: Please ensure all fields are filled out correctly.' },
-        { status: 400 } // 400 Bad Request for validation errors
+        { message: `Validation Error: ${errorMessages}` },
+        { status: 400 }
       );
     }
 
