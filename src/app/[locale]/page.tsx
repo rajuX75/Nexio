@@ -1,6 +1,7 @@
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { ModeToggle } from '@/components/mode-toggle';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 
 export default function Home() {
   const t = useTranslations('HomePage');
@@ -31,7 +32,7 @@ export default function Home() {
           </p>
 
           <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition-colors duration-200">
-            {t('getStarted')}
+            <Link href="/sign-in">{t('getStarted')}</Link>
           </button>
 
           {/* Features Section */}

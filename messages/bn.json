@@ -16,5 +16,46 @@
     "home": "হোম",
     "about": "আমাদের সম্পর্কে",
     "contact": "যোগাযোগ"
+  },
+  "Auth": {
+    "signIn": {
+      "title": "আবার স্বাগতম",
+      "subtitle": "চালিয়ে যেতে আপনার অ্যাকাউন্টে সাইন ইন করুন",
+      "email": "ইমেইল ঠিকানা",
+      "emailPlaceholder": "john@example.com",
+      "password": "পাসওয়ার্ড",
+      "passwordPlaceholder": "আপনার পাসওয়ার্ড লিখুন",
+      "forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?",
+      "rememberMe": "৩০ দিনের জন্য মনে রাখুন",
+      "submitButton": "সাইন ইন",
+      "submittingButton": "সাইন ইন করা হচ্ছে...",
+      "orContinueWith": "অথবা এর সাথে চালিয়ে যান",
+      "noAccount": "অ্যাকাউন্ট নেই?",
+      "signUpLink": "সাইন আপ"
+    },
+    "signUp": {
+      "title": "আপনার অ্যাকাউন্ট তৈরি করুন",
+      "subtitle": "বিনামূল্যে অ্যাকাউন্ট দিয়ে শুরু করুন। কোন ক্রেডিট কার্ড প্রয়োজন নেই।",
+      "username": "ব্যবহারকারীর নাম",
+      "usernamePlaceholder": "johndoe",
+      "email": "ইমেইল ঠিকানা",
+      "emailPlaceholder": "john@example.com",
+      "password": "পাসওয়ার্ড",
+      "passwordPlaceholder": "একটি শক্তিশালী পাসওয়ার্ড তৈরি করুন",
+      "submitButton": "অ্যাকাউন্ট তৈরি করুন",
+      "submittingButton": "অ্যাকাউন্ট তৈরি করা হচ্ছে...",
+      "orContinueWith": "অথবা এর সাথে চালিয়ে যান",
+      "hasAccount": "ইতিমধ্যে একটি অ্যাকাউন্ট আছে?",
+      "signInLink": "সাইন ইন",
+      "termsText": "অ্যাকাউন্ট তৈরি করে, আপনি আমাদের সাথে সম্মত হচ্ছেন",
+      "termsOfService": "সেবার শর্তাবলী",
+      "and": "এবং",
+      "privacyPolicy": "গোপনীয়তা নীতি"
+    },
+    "socialAuth": {
+      "apple": "অ্যাপলের সাথে সাইন ইন",
+      "google": "গুগলের সাথে সাইন ইন",
+      "meta": "মেটার সাথে সাইন ইন"
+    }
   }
 }

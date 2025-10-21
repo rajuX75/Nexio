@@ -16,5 +16,46 @@
     "home": "Home",
     "about": "About",
     "contact": "Contact"
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your account to continue",
+      "email": "Email address",
+      "emailPlaceholder": "john@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot password?",
+      "rememberMe": "Remember me for 30 days",
+      "submitButton": "Sign in",
+      "submittingButton": "Signing in...",
+      "orContinueWith": "Or continue with",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up"
+    },
+    "signUp": {
+      "title": "Create your account",
+      "subtitle": "Get started with your free account. No credit card required.",
+      "username": "Username",
+      "usernamePlaceholder": "johndoe",
+      "email": "Email address",
+      "emailPlaceholder": "john@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Create a strong password",
+      "submitButton": "Create account",
+      "submittingButton": "Creating account...",
+      "orContinueWith": "Or continue with",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "termsText": "By creating an account, you agree to our",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy"
+    },
+    "socialAuth": {
+      "apple": "Sign in with Apple",
+      "google": "Sign in with Google",
+      "meta": "Sign in with Meta"
+    }
   }
 }
