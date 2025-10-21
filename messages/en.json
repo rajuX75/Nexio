@@ -1,0 +1,20 @@
+{
+  "HomePage": {
+    "title": "Hello world!",
+    "welcome": "Welcome to Nexio",
+    "description": "Boost your productivity with Nexio's integrated platform",
+    "getStarted": "Get Started",
+    "features": {
+      "mindMaps": "Mind Maps",
+      "taskManagement": "Task Management",
+      "calendar": "Calendar",
+      "teamChat": "Team Chat",
+      "pomodoro": "Pomodoro Timer"
+    }
+  },
+  "Navigation": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact"
+  }
+}

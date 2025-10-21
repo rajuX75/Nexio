@@ -1,0 +1,20 @@
+{
+  "HomePage": {
+    "title": "হ্যালো বিশ্ব!",
+    "welcome": "নেক্সিওতে স্বাগতম",
+    "description": "আপনার উৎপাদনশীলতা বৃদ্ধি করুন নেক্সিওর সাথে",
+    "getStarted": "শুরু করুন",
+    "features": {
+      "mindMaps": "মাইন্ড ম্যাপ",
+      "taskManagement": "টাস্ক ম্যানেজমেন্ট",
+      "calendar": "ক্যালেন্ডার",
+      "teamChat": "টিম চ্যাট",
+      "pomodoro": "পোমোডোরো টাইমার"
+    }
+  },
+  "Navigation": {
+    "home": "হোম",
+    "about": "আমাদের সম্পর্কে",
+    "contact": "যোগাযোগ"
+  }
+}
