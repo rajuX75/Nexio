@@ -16,15 +16,19 @@ import { cn } from '@/lib/utils';
 import { signInSchema, SignInSchemaType } from '@/schema/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 export function SignInForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations('Auth.signIn');
   const tSocial = useTranslations('Auth.socialAuth');
+  const router = useRouter();
 
   const form = useForm<SignInSchemaType>({
     resolver: zodResolver(signInSchema),
@@ -38,9 +42,21 @@ export function SignInForm({ className, ...props }: React.ComponentProps<'div'>)
   const onSubmit = async (data: SignInSchemaType) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log(data);
+      const result = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error('Sign-in failed. Please check your credentials.');
+      } else {
+        toast.success('Signed in successfully!');
+        router.push('/dashboard');
+      }
+    } catch (error) {
+      console.error('Sign-in error:', error);
+      toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }

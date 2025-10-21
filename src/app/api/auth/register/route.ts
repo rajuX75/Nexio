@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     const result = signUpSchema.safeParse(body);
 
     if (!result.success) {
-      const errorMessages = result.error.errors.map((e) => e.message).join(', ');
+      const errorMessages = result.error.issues.map((e) => e.message).join(', ');
       return NextResponse.json(
         { message: `Validation Error: ${errorMessages}` },
         { status: 400 }
