@@ -15,15 +15,19 @@ import { cn } from '@/lib/utils';
 import { signUpSchema, SignUpSchemaType } from '@/schema/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 export function SignUpForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations('Auth.signUp');
   const tSocial = useTranslations('Auth.socialAuth');
+  const router = useRouter();
 
   const form = useForm<SignUpSchemaType>({
     resolver: zodResolver(signUpSchema),
@@ -37,9 +41,42 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<'div'>)
   const onSubmit = async (data: SignUpSchemaType) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log(data);
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const responseData = await res.json();
+
+      if (!res.ok) {
+        throw new Error(responseData.message || 'Registration failed');
+      }
+
+      if (res.status === 201) {
+        toast.success('Account created successfully!');
+
+        // Sign in the user after successful registration
+        const signInResult = await signIn('credentials', {
+          email: data.email,
+          password: data.password,
+          redirect: false,
+        });
+
+        if (signInResult?.ok) {
+          router.push('/dashboard');
+        } else {
+          toast.error('Account created but sign-in failed. Please try signing in manually.');
+          router.push('/sign-in');
+        }
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      toast.error(
+        error instanceof Error ? error.message : 'Registration failed. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }

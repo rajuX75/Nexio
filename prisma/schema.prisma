@@ -19,6 +19,8 @@ model User {
   hashedPassword           String?
   image                    String?
   completedOnboarding      Boolean             @default(false)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
   accounts                 Account[]
   sessions                 Session[]
   createdWorkspaces        Workspace[]         @relation("CreatedBy")
@@ -36,6 +38,7 @@ model User {
   userNotifications        Notification[]      @relation("NotifyUser")
   userCreatedNotifications Notification[]      @relation("NotifyCreator")
   messages                 Message[]
+
 }
 
 model savedMindMaps {

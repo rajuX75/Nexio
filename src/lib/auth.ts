@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: 'credentials',
       credentials: {
-        name: { label: 'Name', type: 'text', placeholder: 'John Doe' },
+        username: { label: 'username  ', type: 'text', placeholder: 'jhondoe' },
         email: { label: 'Email', type: 'text', placeholder: 'you@example.com' },
         password: { label: 'Password', type: 'password', placeholder: '••••••••' },
       },
@@ -52,8 +52,8 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Validate password length
-        if (credentials.password.length < 6) {
-          throw new Error('Invalid password: Password must be at least 6 characters long.');
+        if (credentials.password.length < 8) {
+          throw new Error('Invalid password: Password must be at least 8 characters long.');
         }
 
         try {
@@ -98,7 +98,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
-        session.user.name = token.name;
+        session.user.username = token.username;
         session.user.email = token.email;
         session.user.image = token.email;
         session.user.username = token.username;
@@ -110,8 +110,9 @@ export const authOptions: NextAuthOptions = {
       });
       if (user) {
         session.user.image = user.image;
-        session.user.name = user.name?.toLowerCase().replace(/\s+/g, '') || null;
+        session.user.username = user.username?.toLowerCase().replace(/\s+/g, '') || null;
       }
+      console.log('SESSION: ', session);
       return session;
     },
     async jwt({ token, user }) {
@@ -127,7 +128,7 @@ export const authOptions: NextAuthOptions = {
       return {
         id: dbUser.id,
         email: dbUser.email,
-        name: dbUser.name,
+        username: dbUser.username,
         picture: dbUser.image,
       };
     },
