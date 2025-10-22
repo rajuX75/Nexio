@@ -57,5 +57,76 @@
       "google": "গুগলের সাথে সাইন ইন",
       "meta": "মেটার সাথে সাইন ইন"
     }
+  },
+  "Onboarding": {
+    "title": "নেক্সিওতে স্বাগতম!",
+    "subtitle": "আপনার অ্যাকাউন্ট সেট আপ করুন এবং শুরু করুন",
+    "step1": {
+      "title": "ব্যক্তিগত তথ্য",
+      "subtitle": "আপনার সম্পর্কে কিছু বলুন",
+      "firstName": "নামের প্রথম অংশ",
+      "firstNamePlaceholder": "জন",
+      "lastName": "নামের শেষ অংশ",
+      "lastNamePlaceholder": "ডো",
+      "company": "কোম্পানি (ঐচ্ছিক)",
+      "companyPlaceholder": "একমে ইনকর্পোরেটেড",
+      "role": "ভূমিকা",
+      "rolePlaceholder": "আপনার ভূমিকা নির্বাচন করুন",
+      "roles": {
+        "developer": "ডেভেলপার",
+        "designer": "ডিজাইনার",
+        "manager": "ম্যানেজার",
+        "student": "ছাত্র",
+        "entrepreneur": "উদ্যোক্তা",
+        "other": "অন্যান্য"
+      }
+    },
+    "step2": {
+      "title": "পছন্দসমূহ",
+      "subtitle": "আপনার অভিজ্ঞতা কাস্টমাইজ করুন",
+      "interests": "আপনার সবচেয়ে আগ্রহের বিষয় কী?",
+      "interestsSubtitle": "যতগুলো খুশি নির্বাচন করুন",
+      "interestsOptions": {
+        "mindMapping": "মাইন্ড ম্যাপিং",
+        "taskManagement": "টাস্ক ম্যানেজমেন্ট",
+        "teamCollaboration": "টিম সহযোগিতা",
+        "timeTracking": "সময় ট্র্যাকিং",
+        "noteTaking": "নোট নেওয়া",
+        "projectPlanning": "প্রজেক্ট পরিকল্পনা"
+      },
+      "experience": "অভিজ্ঞতার স্তর",
+      "experienceOptions": {
+        "beginner": "শিক্ষানবিশ",
+        "intermediate": "মধ্যম",
+        "advanced": "উন্নত"
+      },
+      "notifications": "বিজ্ঞপ্তি পছন্দ",
+      "emailNotifications": "ইমেইল বিজ্ঞপ্তি",
+      "pushNotifications": "পুশ বিজ্ঞপ্তি",
+      "weeklyDigest": "সাপ্তাহিক সারসংক্ষেপ"
+    },
+    "step3": {
+      "title": "সেটআপ সম্পূর্ণ করুন",
+      "subtitle": "আপনি প্রায় প্রস্তুত!",
+      "avatar": "প্রোফাইল ছবি",
+      "uploadAvatar": "একটি ছবি আপলোড করুন",
+      "removeAvatar": "ছবি সরান",
+      "bio": "বায়ো (ঐচ্ছিক)",
+      "bioPlaceholder": "আপনার সম্পর্কে বলুন...",
+      "timezone": "সময় অঞ্চল",
+      "timezonePlaceholder": "আপনার সময় অঞ্চল নির্বাচন করুন"
+    },
+    "navigation": {
+      "next": "পরবর্তী",
+      "previous": "পূর্ববর্তী",
+      "skip": "এড়িয়ে যান",
+      "finish": "সেটআপ সম্পূর্ণ করুন",
+      "completing": "আপনার অ্যাকাউন্ট সেট আপ করা হচ্ছে..."
+    },
+    "progress": "ধাপ {current} এর {total}",
+    "errors": {
+      "setupFailed": "সেটআপ ব্যর্থ। আবার চেষ্টা করুন।",
+      "successMessage": "নেক্সিওতে স্বাগতম! আপনার অ্যাকাউন্ট প্রস্তুত।"
+    }
   }
 }

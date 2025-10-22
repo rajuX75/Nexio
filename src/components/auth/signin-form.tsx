@@ -189,7 +189,7 @@ export function SignInForm({ className, ...props }: React.ComponentProps<'div'>)
               variant="outline"
               type="button"
               disabled={isLoading}
-              onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+              onClick={() => signIn('google', { callbackUrl: '/onboading' })}
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5">
                 <path

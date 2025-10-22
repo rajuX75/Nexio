@@ -67,5 +67,76 @@
       "google": "Sign in with Google",
       "meta": "Sign in with Meta"
     }
+  },
+  "Onboarding": {
+    "title": "Welcome to Nexio!",
+    "subtitle": "Let's set up your account and get you started",
+    "step1": {
+      "title": "Personal Information",
+      "subtitle": "Tell us a bit about yourself",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "John",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Doe",
+      "company": "Company (Optional)",
+      "companyPlaceholder": "Acme Inc.",
+      "role": "Role",
+      "rolePlaceholder": "Select your role",
+      "roles": {
+        "developer": "Developer",
+        "designer": "Designer",
+        "manager": "Manager",
+        "student": "Student",
+        "entrepreneur": "Entrepreneur",
+        "other": "Other"
+      }
+    },
+    "step2": {
+      "title": "Preferences",
+      "subtitle": "Customize your experience",
+      "interests": "What interests you most?",
+      "interestsSubtitle": "Select all that apply",
+      "interestsOptions": {
+        "mindMapping": "Mind Mapping",
+        "taskManagement": "Task Management",
+        "teamCollaboration": "Team Collaboration",
+        "timeTracking": "Time Tracking",
+        "noteTaking": "Note Taking",
+        "projectPlanning": "Project Planning"
+      },
+      "experience": "Experience Level",
+      "experienceOptions": {
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced"
+      },
+      "notifications": "Notification Preferences",
+      "emailNotifications": "Email notifications",
+      "pushNotifications": "Push notifications",
+      "weeklyDigest": "Weekly digest"
+    },
+    "step3": {
+      "title": "Complete Setup",
+      "subtitle": "You're almost ready to go!",
+      "avatar": "Profile Picture",
+      "uploadAvatar": "Upload a photo",
+      "removeAvatar": "Remove photo",
+      "bio": "Bio (Optional)",
+      "bioPlaceholder": "Tell us about yourself...",
+      "timezone": "Timezone",
+      "timezonePlaceholder": "Select your timezone"
+    },
+    "navigation": {
+      "next": "Next",
+      "previous": "Previous",
+      "skip": "Skip",
+      "finish": "Complete Setup",
+      "completing": "Setting up your account..."
+    },
+    "progress": "Step {current} of {total}",
+    "errors": {
+      "setupFailed": "Setup failed. Please try again.",
+      "successMessage": "Welcome to Nexio! Your account is ready."
+    }
   }
 }
