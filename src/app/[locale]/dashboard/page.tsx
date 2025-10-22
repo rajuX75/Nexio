@@ -1,9 +1,16 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
+import { Button } from '../../../components/ui/button';
 
 export default function DashboardPage() {
   const { data: session } = useSession();
+
+  const logOutHandler = () => {
+    signOut({
+      callbackUrl: `${window.location.origin}/sign-in`,
+    });
+  };
 
   if (!session) {
     return <div>Loading...</div>;
@@ -15,10 +22,9 @@ export default function DashboardPage() {
       <p className="mt-4">Welcome, {session.user?.name || session.user?.username}!</p>
       <div className="mt-4 bg-gray-100 p-4 rounded">
         <h2 className="text-lg font-semibold">Session Data:</h2>
-        <pre className="mt-2 text-sm">
-          {JSON.stringify(session, null, 2)}
-        </pre>
+        <pre className="mt-2 text-sm">{JSON.stringify(session, null, 2)}</pre>
       </div>
+      <Button onClick={logOutHandler}>Logout</Button>
     </div>
   );
 }

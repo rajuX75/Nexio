@@ -6,6 +6,7 @@ import AppleProvider from 'next-auth/providers/apple';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GithubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
+import { generateFromEmail } from 'unique-username-generator';
 import { db } from './db';
 
 export const authOptions: NextAuthOptions = {
@@ -21,6 +22,17 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      async profile(profile) {
+        const username = generateFromEmail(profile.email, 5);
+        return {
+          id: profile.sub,
+          username,
+          name: profile.given_name ? profile.given_name : profile.name,
+          surname: profile.family_name ? profile.family_name : '',
+          email: profile.email,
+          image: profile.picture,
+        };
+      },
     }),
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
@@ -101,6 +113,7 @@ export const authOptions: NextAuthOptions = {
         session.user.username = token.username ?? '';
         session.user.email = token.email ?? '';
         session.user.image = token.picture ?? null;
+        session.user.completedOnboarding = token.completedOnboarding ?? false;
       }
       return session;
     },
@@ -123,6 +136,7 @@ export const authOptions: NextAuthOptions = {
         username: dbUser.username,
         email: dbUser.email,
         picture: dbUser.image,
+        completedOnboarding: dbUser.completedOnboarding,
       };
     },
   },

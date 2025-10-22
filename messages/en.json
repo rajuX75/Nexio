@@ -31,7 +31,12 @@
       "submittingButton": "Signing in...",
       "orContinueWith": "Or continue with",
       "noAccount": "Don't have an account?",
-      "signUpLink": "Sign up"
+      "signUpLink": "Sign up",
+      "errors": {
+        "signInFailed": "Sign-in failed. Please check your credentials.",
+        "unexpectedError": "An unexpected error occurred. Please try again.",
+        "successMessage": "Signed in successfully!"
+      }
     },
     "signUp": {
       "title": "Create your account",
@@ -50,7 +55,12 @@
       "termsText": "By creating an account, you agree to our",
       "termsOfService": "Terms of Service",
       "and": "and",
-      "privacyPolicy": "Privacy Policy"
+      "privacyPolicy": "Privacy Policy",
+      "errors": {
+        "registrationFailed": "Registration failed. Please try again.",
+        "accountCreatedSignInFailed": "Account created but sign-in failed. Please try signing in manually.",
+        "successMessage": "Account created successfully!"
+      }
     },
     "socialAuth": {
       "apple": "Sign in with Apple",

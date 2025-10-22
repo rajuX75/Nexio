@@ -27,6 +27,7 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<'div'>)
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations('Auth.signUp');
   const tSocial = useTranslations('Auth.socialAuth');
+  const tErrors = useTranslations('Auth.signUp.errors');
   const router = useRouter();
 
   const form = useForm<SignUpSchemaType>({
@@ -56,7 +57,7 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<'div'>)
       }
 
       if (res.status === 201) {
-        toast.success('Account created successfully!');
+        toast.success(tErrors('successMessage'));
 
         // Sign in the user after successful registration
         const signInResult = await signIn('credentials', {
@@ -68,15 +69,13 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<'div'>)
         if (signInResult?.ok) {
           router.push('/dashboard');
         } else {
-          toast.error('Account created but sign-in failed. Please try signing in manually.');
+          toast.error(tErrors('accountCreatedSignInFailed'));
           router.push('/sign-in');
         }
       }
     } catch (error) {
       console.error('Signup error:', error);
-      toast.error(
-        error instanceof Error ? error.message : 'Registration failed. Please try again.'
-      );
+      toast.error(error instanceof Error ? error.message : tErrors('registrationFailed'));
     } finally {
       setIsLoading(false);
     }
