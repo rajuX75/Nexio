@@ -7,12 +7,14 @@ declare module 'next-auth' {
     user: {
       id: string;
       username: string;
+      surname: string;
       completedOnboarding: boolean;
     } & DefaultSession['user'];
   }
 
   interface User extends DefaultUser {
     username: string;
+    completedOnboarding: boolean;
   }
 }
 
@@ -20,6 +22,7 @@ declare module 'next-auth/jwt' {
   interface JWT extends DefaultJWT {
     id: string;
     username: string;
+    surname: string;
     completedOnboarding?: boolean;
   }
 }
