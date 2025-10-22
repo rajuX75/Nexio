@@ -111,10 +111,11 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
-        session.user.username = token.username ?? '';
-        session.user.email = token.email ?? '';
-        session.user.image = token.picture ?? null;
-        session.user.completedOnboarding = token.completedOnboarding ?? false;
+        session.user.username = token.username;
+        session.user.surname = token.surname;
+        session.user.email = token.email;
+        session.user.image = token.picture;
+        session.user.completedOnboarding = token.completedOnboarding;
       }
       return session;
     },
@@ -135,6 +136,7 @@ export const authOptions: NextAuthOptions = {
       return {
         id: dbUser.id,
         username: dbUser.username,
+        surname: dbUser.surname,
         email: dbUser.email,
         picture: dbUser.image,
         completedOnboarding: dbUser.completedOnboarding,

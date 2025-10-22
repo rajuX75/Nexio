@@ -1,20 +1,37 @@
 'use client';
 
+import { updateUserOnboarding } from '@/app/[locale]/onboarding/actions';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FieldGroup } from '@/components/ui/field';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { OnboardingSchemaType } from '@/schema/onboarding';
-import { Check, Loader2, Upload, User, X } from 'lucide-react';
+import {
+  OnboardingSchemaType,
+  onboardingSchema,
+  step1Schema,
+  step2Schema,
+  step3Schema,
+} from '@/schema/onboarding';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Check, ChevronLeft, ChevronRight, Loader2, Upload, User, X } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -22,9 +39,21 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 const STEPS = [
-  { id: 1, title: 'Personal Information' },
-  { id: 2, title: 'Preferences' },
-  { id: 3, title: 'Complete Setup' },
+  {
+    id: 1,
+    title: 'Personal Information',
+    schema: step1Schema,
+  },
+  {
+    id: 2,
+    title: 'Preferences',
+    schema: step2Schema,
+  },
+  {
+    id: 3,
+    title: 'Complete Setup',
+    schema: step3Schema,
+  },
 ];
 
 export function OnboardingForm({ className, ...props }: React.ComponentProps<'div'>) {
@@ -39,11 +68,13 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
   const tNav = useTranslations('Onboarding.navigation');
   const tErrors = useTranslations('Onboarding.errors');
   const router = useRouter();
+  const { data: session, update } = useSession();
 
   const form = useForm<OnboardingSchemaType>({
+    resolver: zodResolver(onboardingSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
+      firstName: session?.user?.name ?? '',
+      lastName: session?.user?.surname ?? '',
       company: '',
       role: 'developer',
       interests: [],
@@ -51,7 +82,7 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
       emailNotifications: true,
       pushNotifications: true,
       weeklyDigest: false,
-      avatar: '',
+      avatar: session?.user?.image ?? '',
       bio: '',
       timezone: '',
     },
@@ -76,15 +107,8 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
   };
 
   const nextStep = async () => {
-    let isValid = false;
-
-    if (currentStep === 1) {
-      isValid = await form.trigger(['firstName', 'lastName', 'role']);
-    } else if (currentStep === 2) {
-      isValid = await form.trigger(['interests', 'experience']);
-    } else if (currentStep === 3) {
-      isValid = await form.trigger(['timezone']);
-    }
+    const currentSchema = STEPS[currentStep - 1].schema;
+    const isValid = await form.trigger(Object.keys(currentSchema.shape));
 
     if (isValid) {
       setCurrentStep(currentStep + 1);
@@ -98,11 +122,21 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
   const onSubmit = async (data: OnboardingSchemaType) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await updateUserOnboarding(data);
 
-      toast.success(tErrors('successMessage'));
-      router.push('/dashboard');
+      if (response.success) {
+        await update({
+          ...session,
+          user: {
+            ...session?.user,
+            completedOnboarding: true,
+          },
+        });
+        toast.success(t('successMessage'));
+        router.push('/dashboard');
+      } else {
+        toast.error(response.error || tErrors('setupFailed'));
+      }
     } catch (error) {
       console.error('Onboarding error:', error);
       toast.error(tErrors('setupFailed'));
@@ -113,11 +147,10 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
 
   const renderStep1 = () => (
     <>
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">{tStep1('title')}</h1>
-        <p className="text-muted-foreground text-sm text-balance max-w-sm">{tStep1('subtitle')}</p>
+      <div className="text-center">
+        <h1 className="text-2xl font-bold tracking-tight">{tStep1('title')}</h1>
+        <p className="text-muted-foreground text-sm mt-2">{tStep1('subtitle')}</p>
       </div>
-
       <div className="grid grid-cols-2 gap-4">
         <FormField
           control={form.control}
@@ -137,7 +170,6 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="lastName"
@@ -157,7 +189,6 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
           )}
         />
       </div>
-
       <FormField
         control={form.control}
         name="company"
@@ -176,28 +207,27 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
           </FormItem>
         )}
       />
-
       <FormField
         control={form.control}
         name="role"
         render={({ field }) => (
           <FormItem>
             <FormLabel>{tStep1('role')}</FormLabel>
-            <FormControl>
-              <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={isLoading}
-                {...field}
-              >
-                <option value="">{tStep1('rolePlaceholder')}</option>
-                <option value="developer">{tStep1('roles.developer')}</option>
-                <option value="designer">{tStep1('roles.designer')}</option>
-                <option value="manager">{tStep1('roles.manager')}</option>
-                <option value="student">{tStep1('roles.student')}</option>
-                <option value="entrepreneur">{tStep1('roles.entrepreneur')}</option>
-                <option value="other">{tStep1('roles.other')}</option>
-              </select>
-            </FormControl>
+            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder={tStep1('rolePlaceholder')} />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="developer">{tStep1('roles.developer')}</SelectItem>
+                <SelectItem value="designer">{tStep1('roles.designer')}</SelectItem>
+                <SelectItem value="manager">{tStep1('roles.manager')}</SelectItem>
+                <SelectItem value="student">{tStep1('roles.student')}</SelectItem>
+                <SelectItem value="entrepreneur">{tStep1('roles.entrepreneur')}</SelectItem>
+                <SelectItem value="other">{tStep1('roles.other')}</SelectItem>
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}
@@ -207,41 +237,52 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
 
   const renderStep2 = () => (
     <>
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">{tStep2('title')}</h1>
-        <p className="text-muted-foreground text-sm text-balance max-w-sm">{tStep2('subtitle')}</p>
+      <div className="text-center">
+        <h1 className="text-2xl font-bold tracking-tight">{tStep2('title')}</h1>
+        <p className="text-muted-foreground text-sm mt-2">{tStep2('subtitle')}</p>
       </div>
-
       <div>
         <FormLabel className="text-base font-medium">{tStep2('interests')}</FormLabel>
         <p className="text-sm text-muted-foreground mb-4">{tStep2('interestsSubtitle')}</p>
         <FormField
           control={form.control}
           name="interests"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { key: 'mindMapping', label: tStep2('interestsOptions.mindMapping') },
-                  { key: 'taskManagement', label: tStep2('interestsOptions.taskManagement') },
-                  { key: 'teamCollaboration', label: tStep2('interestsOptions.teamCollaboration') },
-                  { key: 'timeTracking', label: tStep2('interestsOptions.timeTracking') },
-                  { key: 'noteTaking', label: tStep2('interestsOptions.noteTaking') },
-                  { key: 'projectPlanning', label: tStep2('interestsOptions.projectPlanning') },
-                ].map(({ key, label }) => (
-                  <FormItem key={key} className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value?.includes(key as any)}
-                        onCheckedChange={(checked) => {
-                          return checked
-                            ? field.onChange([...field.value, key as any])
-                            : field.onChange(field.value?.filter((value) => value !== key));
-                        }}
-                      />
-                    </FormControl>
-                    <FormLabel className="text-sm font-normal">{label}</FormLabel>
-                  </FormItem>
+                  'mindMapping',
+                  'taskManagement',
+                  'teamCollaboration',
+                  'timeTracking',
+                  'noteTaking',
+                  'projectPlanning',
+                ].map((item) => (
+                  <FormField
+                    key={item}
+                    control={form.control}
+                    name="interests"
+                    render={({ field }) => (
+                      <FormItem
+                        key={item}
+                        className="flex flex-row items-start space-x-3 space-y-0"
+                      >
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value?.includes(item)}
+                            onCheckedChange={(checked) => {
+                              return checked
+                                ? field.onChange([...field.value, item])
+                                : field.onChange(field.value?.filter((value) => value !== item));
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal">
+                          {tStep2(`interestsOptions.${item}`)}
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
                 ))}
               </div>
               <FormMessage />
@@ -249,42 +290,41 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
           )}
         />
       </div>
-
       <FormField
         control={form.control}
         name="experience"
         render={({ field }) => (
           <FormItem>
             <FormLabel>{tStep2('experience')}</FormLabel>
-            <FormControl>
-              <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={isLoading}
-                {...field}
-              >
-                <option value="">Select your experience level</option>
-                <option value="beginner">{tStep2('experienceOptions.beginner')}</option>
-                <option value="intermediate">{tStep2('experienceOptions.intermediate')}</option>
-                <option value="advanced">{tStep2('experienceOptions.advanced')}</option>
-              </select>
-            </FormControl>
+            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder={tStep2('experiencePlaceholder')} />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="beginner">{tStep2('experienceOptions.beginner')}</SelectItem>
+                <SelectItem value="intermediate">
+                  {tStep2('experienceOptions.intermediate')}
+                </SelectItem>
+                <SelectItem value="advanced">{tStep2('experienceOptions.advanced')}</SelectItem>
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}
       />
-
       <div>
         <FormLabel className="text-base font-medium">{tStep2('notifications')}</FormLabel>
+        <FormDescription className="text-sm">{tStep2('notificationsSubtitle')}</FormDescription>
         <div className="space-y-3 mt-4">
           <FormField
             control={form.control}
             name="emailNotifications"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-sm font-normal">
-                    {tStep2('emailNotifications')}
-                  </FormLabel>
+                  <FormLabel className="text-sm">{tStep2('emailNotifications')}</FormLabel>
                 </div>
                 <FormControl>
                   <Checkbox checked={field.value} onCheckedChange={field.onChange} />
@@ -296,11 +336,9 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
             control={form.control}
             name="pushNotifications"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-sm font-normal">
-                    {tStep2('pushNotifications')}
-                  </FormLabel>
+                  <FormLabel className="text-sm">{tStep2('pushNotifications')}</FormLabel>
                 </div>
                 <FormControl>
                   <Checkbox checked={field.value} onCheckedChange={field.onChange} />
@@ -312,9 +350,9 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
             control={form.control}
             name="weeklyDigest"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-sm font-normal">{tStep2('weeklyDigest')}</FormLabel>
+                  <FormLabel className="text-sm">{tStep2('weeklyDigest')}</FormLabel>
                 </div>
                 <FormControl>
                   <Checkbox checked={field.value} onCheckedChange={field.onChange} />
@@ -329,11 +367,10 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
 
   const renderStep3 = () => (
     <>
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">{tStep3('title')}</h1>
-        <p className="text-muted-foreground text-sm text-balance max-w-sm">{tStep3('subtitle')}</p>
+      <div className="text-center">
+        <h1 className="text-2xl font-bold tracking-tight">{tStep3('title')}</h1>
+        <p className="text-muted-foreground text-sm mt-2">{tStep3('subtitle')}</p>
       </div>
-
       <div className="flex flex-col items-center gap-4">
         <div className="relative">
           {avatarPreview ? (
@@ -357,13 +394,12 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
             </div>
           )}
         </div>
-
         <div className="text-center">
           <label htmlFor="avatar-upload" className="cursor-pointer">
             <Button type="button" variant="outline" size="sm" asChild>
               <span>
                 <Upload className="h-4 w-4 mr-2" />
-                {avatarPreview ? tStep3('removeAvatar') : tStep3('uploadAvatar')}
+                {avatarPreview ? tStep3('changeAvatar') : tStep3('uploadAvatar')}
               </span>
             </Button>
           </label>
@@ -376,7 +412,6 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
           />
         </div>
       </div>
-
       <FormField
         control={form.control}
         name="bio"
@@ -384,9 +419,9 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
           <FormItem>
             <FormLabel>{tStep3('bio')}</FormLabel>
             <FormControl>
-              <textarea
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              <Textarea
                 placeholder={tStep3('bioPlaceholder')}
+                className="resize-none"
                 disabled={isLoading}
                 {...field}
               />
@@ -395,47 +430,24 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
           </FormItem>
         )}
       />
-
       <FormField
         control={form.control}
         name="timezone"
         render={({ field }) => (
           <FormItem>
             <FormLabel>{tStep3('timezone')}</FormLabel>
-            <FormControl>
-              <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={isLoading}
-                {...field}
-              >
-                <option value="">{tStep3('timezonePlaceholder')}</option>
-                <option value="UTC-12">UTC-12 (Baker Island)</option>
-                <option value="UTC-11">UTC-11 (American Samoa)</option>
-                <option value="UTC-10">UTC-10 (Hawaii)</option>
-                <option value="UTC-9">UTC-9 (Alaska)</option>
-                <option value="UTC-8">UTC-8 (Pacific Time)</option>
-                <option value="UTC-7">UTC-7 (Mountain Time)</option>
-                <option value="UTC-6">UTC-6 (Central Time)</option>
-                <option value="UTC-5">UTC-5 (Eastern Time)</option>
-                <option value="UTC-4">UTC-4 (Atlantic Time)</option>
-                <option value="UTC-3">UTC-3 (Brazil)</option>
-                <option value="UTC-2">UTC-2 (Mid-Atlantic)</option>
-                <option value="UTC-1">UTC-1 (Azores)</option>
-                <option value="UTC+0">UTC+0 (Greenwich)</option>
-                <option value="UTC+1">UTC+1 (Central European)</option>
-                <option value="UTC+2">UTC+2 (Eastern European)</option>
-                <option value="UTC+3">UTC+3 (Moscow)</option>
-                <option value="UTC+4">UTC+4 (Gulf)</option>
-                <option value="UTC+5">UTC+5 (Pakistan)</option>
-                <option value="UTC+6">UTC+6 (Bangladesh)</option>
-                <option value="UTC+7">UTC+7 (Thailand)</option>
-                <option value="UTC+8">UTC+8 (China)</option>
-                <option value="UTC+9">UTC+9 (Japan)</option>
-                <option value="UTC+10">UTC+10 (Australia)</option>
-                <option value="UTC+11">UTC+11 (Solomon Islands)</option>
-                <option value="UTC+12">UTC+12 (New Zealand)</option>
-              </select>
-            </FormControl>
+            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder={tStep3('timezonePlaceholder')} />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {[
+                  'UTC-12', 'UTC-11', 'UTC-10', 'UTC-9', 'UTC-8', 'UTC-7', 'UTC-6', 'UTC-5', 'UTC-4', 'UTC-3', 'UTC-2', 'UTC-1', 'UTC+0', 'UTC+1', 'UTC+2', 'UTC+3', 'UTC+4', 'UTC+5', 'UTC+6', 'UTC+7', 'UTC+8', 'UTC+9', 'UTC+10', 'UTC+11', 'UTC+12'
+                ].map(tz => <SelectItem key={tz} value={tz}>{tz}</SelectItem>)}
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}
@@ -445,91 +457,63 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<'di
 
   return (
     <Form {...form}>
-      <div className={cn('flex flex-col gap-6', className)} {...props}>
-        {/* Progress indicator */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            {STEPS.map((step) => (
-              <div key={step.id} className="flex items-center gap-2">
-                <div
-                  className={cn(
-                    'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
-                    currentStep >= step.id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
-                  )}
-                >
-                  {currentStep > step.id ? <Check className="h-4 w-4" /> : step.id}
-                </div>
-                {step.id < STEPS.length && (
-                  <div
-                    className={cn('w-8 h-0.5', currentStep > step.id ? 'bg-primary' : 'bg-muted')}
-                  />
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={cn('flex flex-col gap-8', className)}
+        {...props}
+      >
+        <div className="flex items-center justify-center gap-4">
+          {STEPS.map((step) => (
+            <div key={step.id} className="flex flex-col items-center gap-2">
+              <div
+                className={cn(
+                  'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors',
+                  currentStep >= step.id
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground'
                 )}
+              >
+                {currentStep > step.id ? <Check className="h-4 w-4" /> : step.id}
               </div>
-            ))}
-          </div>
-          <span className="text-sm text-muted-foreground">
-            {t('progress', { current: currentStep, total: STEPS.length })}
-          </span>
+              <span
+                className={cn(
+                  'text-xs text-center',
+                  currentStep >= step.id ? 'text-primary' : 'text-muted-foreground'
+                )}
+              >
+                {t(`steps.${step.id - 1}`)}
+              </span>
+            </div>
+          ))}
         </div>
 
-        <FieldGroup>
+        <div className="space-y-6">
           {currentStep === 1 && renderStep1()}
           {currentStep === 2 && renderStep2()}
           {currentStep === 3 && renderStep3()}
+        </div>
 
-          <div className="flex gap-3">
-            {currentStep > 1 && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={prevStep}
-                disabled={isLoading}
-                className="flex-1"
-              >
-                {tNav('previous')}
-              </Button>
-            )}
-
-            {currentStep < STEPS.length ? (
-              <Button type="button" onClick={nextStep} disabled={isLoading} className="flex-1">
-                {tNav('next')}
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                onClick={form.handleSubmit(onSubmit)}
-                disabled={isLoading}
-                className="flex-1"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {tNav('completing')}
-                  </>
-                ) : (
-                  tNav('finish')
-                )}
-              </Button>
-            )}
-          </div>
-
-          {currentStep < STEPS.length && (
-            <div className="text-center">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={form.handleSubmit(onSubmit)}
-                disabled={isLoading}
-                className="text-sm text-muted-foreground"
-              >
-                {tNav('skip')}
-              </Button>
-            </div>
+        <div className="flex gap-3">
+          {currentStep > 1 && (
+            <Button type="button" variant="outline" onClick={prevStep} disabled={isLoading}>
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              {tNav('previous')}
+            </Button>
           )}
-        </FieldGroup>
-      </div>
+          <div className="flex-1" />
+          {currentStep < STEPS.length ? (
+            <Button type="button" onClick={nextStep} disabled={isLoading}>
+              {tNav('next')}
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          ) : (
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {tNav('finish')}
+            </Button>
+          )}
+        </div>
+      </form>
     </Form>
   );
 }

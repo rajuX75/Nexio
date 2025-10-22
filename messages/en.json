@@ -65,7 +65,8 @@
     "socialAuth": {
       "apple": "Sign in with Apple",
       "google": "Sign in with Google",
-      "meta": "Sign in with Meta"
+      "meta": "Sign in with Meta",
+      "github": "Sign in with Github"
     }
   },
   "Onboarding": {
@@ -134,6 +135,11 @@
       "completing": "Setting up your account..."
     },
     "progress": "Step {current} of {total}",
+    "steps": [
+      "Personal Info",
+      "Preferences",
+      "Final Touches"
+    ],
     "errors": {
       "setupFailed": "Setup failed. Please try again.",
       "successMessage": "Welcome to Nexio! Your account is ready."
